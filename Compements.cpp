@@ -3,9 +3,11 @@
 
 using namespace std;
 
-void onesComplement(string binary, string &result) {
+void onesComplement(string binary, string &result)
+{
     int length = binary.length();
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++)
+    {
         if (binary[i] == '0')
             result[i] = '1';
         else
@@ -13,22 +15,28 @@ void onesComplement(string binary, string &result) {
     }
 }
 
-void twosComplement(string binary, string &result) {
+void twosComplement(string binary, string &result)
+{
     int length = binary.length();
     onesComplement(binary, result);
     int carry = 1;
-    for (int i = length - 1; i >= 0; i--) {
-        if (result[i] == '0' && carry == 1) {
+    for (int i = length - 1; i >= 0; i--)
+    {
+        if (result[i] == '0' && carry == 1)
+        {
             result[i] = '1';
             carry = 0;
-        } else if (result[i] == '1' && carry == 1) {
+        }
+        else if (result[i] == '1' && carry == 1)
+        {
             result[i] = '0';
             carry = 1;
         }
     }
 }
 
-int main() {
+int main()
+{
     string binary, onesComp, twosComp;
     cout << "Enter a binary number: ";
     cin >> binary;
