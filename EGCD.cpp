@@ -2,8 +2,6 @@
 
 using namespace std;
 
-// Function to find the GCD of two numbers and the coefficients that can be used to express that GCD as a linear combination of the two numbers
-// The coefficients are returned as references to x and y
 int extended_euclidean_algorithm(int a, int b, int &x, int &y) {
     if (b == 0) {
         x = 1;
@@ -17,20 +15,31 @@ int extended_euclidean_algorithm(int a, int b, int &x, int &y) {
 }
 
 int main() {
-    int a = 10, b = 6, x, y;
-    int gcd = extended_euclidean_algorithm(a, b, x, y);
-    cout << "GCD of " << a << " and " << b << " is " << gcd << endl;
-    cout << "Coefficients: " << x << ", " << y << endl;
+    int choice;
+    int a, b, x, y, gcd;
 
-    a = 17, b = 12;
-    gcd = extended_euclidean_algorithm(a, b, x, y);
-    cout << "GCD of " << a << " and " << b << " is " << gcd << endl;
-    cout << "Coefficients: " << x << ", " << y << endl;
+    do {
+        cout << "Menu:\n";
+        cout << "1. Find GCD and coefficients\n";
+        cout << "2. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
 
-    a = 121, b = 44;
-    gcd = extended_euclidean_algorithm(a, b, x, y);
-    cout << "GCD of " << a << " and " << b << " is " << gcd << endl;
-    cout << "Coefficients: " << x << ", " << y << endl;
+        switch (choice) {
+            case 1:
+                cout << "Enter two integers: ";
+                cin >> a >> b;
+                gcd = extended_euclidean_algorithm(a, b, x, y);
+                cout << "GCD of " << a << " and " << b << " is " << gcd << endl;
+                cout << "Coefficients: " << x << ", " << y << endl;
+                break;
+            case 2:
+                cout << "Exiting...\n";
+                break;
+            default:
+                cout << "Invalid choice!\n";
+        }
+    } while (choice != 2);
 
     return 0;
 }
