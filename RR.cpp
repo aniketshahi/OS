@@ -1,87 +1,106 @@
-#include <iostream>
-#include <deque>
-#include <vector>
-#include <algorithm>
+#include<iostream>
+#include<vector>
+#include<algorithm>
 
 using namespace std;
 
 struct Process {
-    string name;
-    int burst_time;
-    int remaining_time;
+    int pid;
     int arrival_time;
+    int burst_time;
     int completion_time;
     int turnaround_time;
     int waiting_time;
+    int response_time;
 };
 
-void round_robin(vector<Process>& processes, int quantum) {
-    int n = processes.size();
-    deque<int> queue;
-    int time = 0;
-    int index = 0;
+int main() {
+    int num_processes, quantum_time;
+    cout << "Enter the number of processes: ";
+    cin >> num_processes;
+    cout << "Enter the time quantum: ";
+    cin >> quantum_time;
 
-    // Initialize the queue with the first process.
-    queue.push_back(0);
+    // Initialize the vector of processes
+    vector<Process> processes(num_processes);
 
-    while (!queue.empty()) {
-        // Get the next process from the queue.
-        index = queue.front();
-        queue.pop_front();
+    // Take user input for process details
+    for (int i = 0; i < num_processes; i++) {
+        cout << "Enter details for Process " << i+1 << ":" << endl;
+        cout << "Enter arrival time: ";
+        cin >> processes[i].arrival_time;
+        cout << "Enter burst time: ";
+        cin >> processes[i].burst_time;
+        processes[i].pid = i+1;
+    }
 
-        // If the process is completed, update the completion time, 
-        // turnaround time, and waiting time.
-        if (processes[index].remaining_time <= quantum) {
-            time += processes[index].remaining_time;
-            processes[index].completion_time = time;
-            processes[index].turnaround_time = processes[index].completion_time - processes[index].arrival_time;
-            processes[index].waiting_time = processes[index].turnaround_time - processes[index].burst_time;
-        }
-        // Otherwise, run the process for the time quantum and add it back to the queue.
-        else {
-            time += quantum;
-            processes[index].remaining_time -= quantum;
-            queue.push_back(index);
-        }
+    // Sort the processes by arrival time
+    sort(processes.begin(), processes.end(), [](Process a, Process b){
+        return a.arrival_time < b.arrival_time;
+    });
 
-        // Add any newly arrived processes to the queue.
-        for (int i = 0; i < n; i++) {
-            if (processes[i].arrival_time <= time && 
-                find(queue.begin(), queue.end(), i) == queue.end() && 
-                processes[i].remaining_time > 0) {
+    // Initialize the remaining time for each process to be the burst time
+    vector<int> remaining_time(num_processes);
+    for (int i = 0; i < num_processes; i++) {
+        remaining_time[i] = processes[i].burst_time;
+    }
+
+    // Initialize the current time and the queue of processes
+    int current_time = processes[0].arrival_time;
+    vector<int> queue;
+
+    // Perform the round-robin scheduling
+    while (true) {
+        bool done = true;
+        for (int i = 0; i < num_processes; i++) {
+            if (remaining_time[i] > 0 && processes[i].arrival_time <= current_time) {
+                done = false;
                 queue.push_back(i);
             }
         }
-    }
-}
-
-void print_result(vector<Process>& processes) {
-    cout << "Process\tBurst Time\tArrival Time\tCompletion Time\tTurnaround Time\tWaiting Time\n";
-    for (Process process : processes) {
-        cout << process.name << "\t" << process.burst_time << "\t\t" << process.arrival_time << "\t\t";
-        cout << process.completion_time << "\t\t" << process.turnaround_time << "\t\t" << process.waiting_time << "\n";
-    }
-}
-
-int main() {
-    int n;
-    int quantum;
-    cout << "Enter the number of processes: ";
-    cin >> n;
-    vector<Process> processes(n);
-
-    // Get the input for each process.
-    for (int i = 0; i < n; i++) {
-        cout << "Enter the name, burst time, and arrival time of process " << i + 1 << ": ";
-        cin >> processes[i].name >> processes[i].burst_time >> processes[i].arrival_time;
-        processes[i].remaining_time = processes[i].burst_time;
+        if (done) {
+            break;
+        }
+        int next_process = queue[0];
+        queue.erase(queue.begin());
+        if (remaining_time[next_process] > quantum_time) {
+            remaining_time[next_process] -= quantum_time;
+            current_time += quantum_time;
+            queue.push_back(next_process);
+        } else {
+            current_time += remaining_time[next_process];
+            remaining_time[next_process] = 0;
+            processes[next_process].completion_time = current_time;
+            processes[next_process].turnaround_time = processes[next_process].completion_time - processes[next_process].arrival_time;
+            processes[next_process].waiting_time = processes[next_process].turnaround_time - processes[next_process].burst_time;
+            processes[next_process].response_time = processes[next_process].completion_time - processes[next_process].arrival_time - processes[next_process].burst_time;
+        }
     }
 
-    cout << "Enter the time quantum: ";
-    cin >> quantum;
+    // Calculate the average completion time, average turnaround time, throughput, and CPU utilization
+    double avg_completion_time = 0;
+    double avg_turnaround_time = 0;
+    double throughput = (double)num_processes / current_time;
+    double cpu_utilization = 0;
+    for (int i = 0; i < num_processes; i++) {
+        avg_completion_time += processes[i].completion_time;
+        avg_turnaround_time += processes[i].turnaround_time;
+        cpu_utilization += processes[i].burst_time;
+    }
+    avg_completion_time /= num_processes;
+    avg_turnaround_time /= num_processes;
+    cpu_utilization /= current_time;
 
-    round_robin(processes, quantum);
-    print_result(processes);
+    // Print the results
+    cout << "Process\tArrival Time\tBurst Time\tCompletion Time\tTurnaround Time\tWaiting Time\tResponse Time" << endl;
+    for (int i = 0; i < num_processes; i++) {
+        cout << processes[i].pid << "\t\t" << processes[i].arrival_time << "\t\t" << processes[i].burst_time << "\t\t" << processes[i].completion_time << "\t\t" << processes[i].turnaround_time << "\t\t" << processes[i].waiting_time << "\t\t" << processes[i].response_time << endl;
+    }
+    cout << endl;
+    cout << "Average Completion Time: " << avg_completion_time << endl;
+    cout << "Average Turnaround Time: " << avg_turnaround_time << endl;
+    cout << "Throughput: " << throughput << endl;
+    cout << "CPU Utilization: " << cpu_utilization << endl;
 
     return 0;
 }
