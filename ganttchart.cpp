@@ -44,10 +44,13 @@ int main() {
     for (const auto& process : processes) {
         // Calculate the duration and the number of spaces needed for alignment
         int duration = process.end_time - process.start_time;
-        int spaces = process.start_time * (duration_width + 1);
+        string spaces;
+        for (int i = 0; i < process.start_time * (duration_width + 1); i++) {
+            spaces += " ";
+        }
 
         // Print the process name and the necessary number of spaces
-        cout << process.name << string(spaces - process.name.size(), ' ');
+        cout << process.name << spaces;
 
         // Print the horizontal bar
         cout << "|";
