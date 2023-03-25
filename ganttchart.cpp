@@ -34,11 +34,8 @@ int main() {
     int duration_width = to_string(max_duration).size();
 
     // Print the chart header
-    cout << string(duration_width + 2, ' ') << "|";
-    for (int i = 0; i <= max_duration; i++) {
-        cout << "-";
-    }
-    cout << endl;
+    cout << "                    Gantt Chart" << endl;
+    cout << "---------------------------------------------------" << endl;
 
     // Print the processes
     for (const auto& process : processes) {
@@ -50,22 +47,20 @@ int main() {
         }
 
         // Print the process name and the necessary number of spaces
-        cout << process.name << spaces;
+        cout << "| " << process.name << spaces;
 
         // Print the horizontal bar
-        cout << "|";
-        for (int i = 0; i < duration; i++) {
-            cout << "-";
+        cout << string(duration, '-') << " ";
+
+        // Print the remaining spaces
+        for (int i = 0; i < (max_duration - duration) * (duration_width + 1); i++) {
+            cout << " ";
         }
-        cout << endl;
+        cout << "|" << endl;
     }
 
     // Print the chart footer
-    cout << string(duration_width + 2, ' ') << "|";
-    for (int i = 0; i <= max_duration; i++) {
-        cout << "-";
-    }
-    cout << endl;
+    cout << "---------------------------------------------------" << endl;
 
     return 0;
 }
