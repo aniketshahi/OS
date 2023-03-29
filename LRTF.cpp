@@ -1,98 +1,124 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
 #include <iomanip>
-
+#include <climits>
 using namespace std;
 
-struct Process {
+struct process_struct
+{
     int pid;
-    int arrival_time;
-    int burst_time;
-    int remaining_time;
-};
+    int at;
+    int bt;
+    int ct, wt, tat, rt, start_time;
+} ps[100];
 
-bool compare_arrival(Process p1, Process p2) {
-    return p1.arrival_time < p2.arrival_time;
-}
+int main()
+{
 
-bool compare_remaining(Process p1, Process p2) {
-    return p1.remaining_time > p2.remaining_time;
-}
+    int n;
+    float bt_remaining[100];
+    bool is_completed[100] = {false}, is_first_process = true;
+    int current_time = 0;
+    int completed = 0;
+    ;
+    float sum_tat = 0, sum_wt = 0, sum_rt = 0, total_idle_time = 0, length_cycle, prev = 0;
+    float cpu_utilization;
+    int max_completion_time, min_arrival_time;
 
-int main() {
-    int n; // number of processes
-    vector<Process> processes;
+    cout << fixed << setprecision(2);
 
-    cout << "Enter the number of processes: ";
+    cout << "Enter total number of processes: ";
     cin >> n;
-
-    // Input process details
-    for (int i = 0; i < n; i++) {
-        Process p;
-        p.pid = i + 1;
-        cout << "Enter arrival time of process " << p.pid << ": ";
-        cin >> p.arrival_time;
-        cout << "Enter burst time of process " << p.pid << ": ";
-        cin >> p.burst_time;
-        p.remaining_time = p.burst_time;
-        processes.push_back(p);
+    for (int i = 0; i < n; i++)
+    {
+        cout << "\nEnter Process " << i << " Arrival Time: ";
+        cin >> ps[i].at;
+        ps[i].pid = i;
     }
 
-    // Sort processes by arrival time
-    sort(processes.begin(), processes.end(), compare_arrival);
+    for (int i = 0; i < n; i++)
+    {
+        cout << "\nEnter Process " << i << " Burst Time: ";
+        cin >> ps[i].bt;
+        bt_remaining[i] = ps[i].bt;
+    }
 
-    vector<int> completion_time(n);
-    vector<int> turnaround_time(n);
-    vector<int> waiting_time(n);
-
-    int current_time = 0;
-    int completed_processes = 0;
-    int cpu_utilization = 0;
-
-    cout << endl << "Scheduling table:" << endl;
-    cout << "PID\tArrival Time\tBurst Time\tCompletion Time\tTurnaround Time\tWaiting Time" << endl;
-
-    while (completed_processes < n) {
-        // Find process with longest remaining time
-        int index = -1;
-        int longest_remaining_time = -1;
-        for (int i = 0; i < n; i++) {
-            if (processes[i].arrival_time <= current_time && processes[i].remaining_time > longest_remaining_time) {
-                longest_remaining_time = processes[i].remaining_time;
-                index = i;
+    while (completed != n)
+    {
+        // find process with min. burst time in ready queue at current time
+        int max_index = -1;
+        int maximum = INT_MIN;
+        for (int i = 0; i < n; i++)
+        {
+            if (ps[i].at <= current_time && is_completed[i] == false)
+            {
+                if (bt_remaining[i] > maximum)
+                {
+                    maximum = bt_remaining[i];
+                    ;
+                    max_index = i;
+                }
+                if (bt_remaining[i] == maximum)
+                {
+                    if (ps[i].at < ps[max_index].at)
+                    {
+                        maximum = bt_remaining[i];
+                        ;
+                        max_index = i;
+                    }
+                }
             }
         }
 
-        if (index == -1) {
-            // No process is available at current time, wait for the next process
+        if (max_index == -1)
             current_time++;
-        } else {
-            // Execute the process with longest remaining time
-            int current_burst_time = processes[index].remaining_time;
-            cpu_utilization += current_burst_time;
-            current_time += current_burst_time;
-            processes[index].remaining_time = 0;
-            completed_processes++;
+        else
+        {
+            if (bt_remaining[max_index] == ps[max_index].bt)
+            {
+                ps[max_index].start_time = current_time;
+                total_idle_time += (is_first_process == true) ? 0 : (ps[max_index].start_time - prev);
+                is_first_process = false;
+            }
+            bt_remaining[max_index] -= 1;
+            current_time++;
+            prev = current_time;
+            if (bt_remaining[max_index] == 0)
+            {
+                ps[max_index].ct = current_time;
+                ps[max_index].tat = ps[max_index].ct - ps[max_index].at;
+                ps[max_index].wt = ps[max_index].tat - ps[max_index].bt;
+                ps[max_index].rt = ps[max_index].start_time - ps[max_index].at;
 
-            // Update completion time, turnaround time, and waiting time
-            completion_time[index] = current_time;
-            turnaround_time[index] = completion_time[index] - processes[index].arrival_time;
-            waiting_time[index] = turnaround_time[index] - processes[index].burst_time;
-
-            // Print process details in scheduling table
-            cout << processes[index].pid << "\t" << processes[index].arrival_time << "\t\t" << processes[index].burst_time << "\t\t"
-                << completion_time[index] << "\t\t" << turnaround_time[index] << "\t\t" << waiting_time[index] << endl;
+                sum_tat += ps[max_index].tat;
+                sum_wt += ps[max_index].wt;
+                sum_rt += ps[max_index].rt;
+                completed++;
+                is_completed[max_index] = true;
+            }
         }
     }
+    // Calculate Length of Process completion cycle
+    max_completion_time = INT_MIN;
+    min_arrival_time = INT_MAX;
+    for (int i = 0; i < n; i++)
+    {
+        max_completion_time = max(max_completion_time, ps[i].ct);
+        min_arrival_time = min(min_arrival_time, ps[i].at);
+    }
+    length_cycle = max_completion_time - min_arrival_time;
+    // Output
+    cout << "\nProcess No.\tAT\tCPU Burst Time\tCT\tTAT\tWT\tRT\n";
+    for (int i = 0; i < n; i++)
+        cout << i << "\t\t" << ps[i].at << "\t" << ps[i].bt << "\t\t" << ps[i].ct << "\t" << ps[i].tat << "\t" << ps[i].wt << "\t" << ps[i].rt << endl;
+    cout << endl;
 
-    // Calculate throughput and CPU utilization
-    double throughput = (double) n / current_time * 100;
-    double avg_cpu_utilization = (double) cpu_utilization / current_time * 100;
+    cpu_utilization = (float)(length_cycle - total_idle_time) / length_cycle;
 
-    // Print throughput and CPU utilization
-    cout << endl << "Throughput: " << fixed << setprecision(2) << throughput << "%" << endl;
-    cout << "CPU Utilization: " << fixed << setprecision(2) << avg_cpu_utilization << "%" << endl;
-
+    cout << "\nAverage Turn Around time= " << (float)sum_tat / n;
+    cout << "\nAverage Waiting Time= " << (float)sum_wt / n;
+    cout << "\nAverage Response Time= " << (float)sum_rt / n;
+    cout << "\nThroughput= " << (n / (float)length_cycle) * 100 << " %";
+    cout << "\nCPU Utilization(Percentage)= " << cpu_utilization * 100;
     return 0;
 }
