@@ -24,17 +24,17 @@ int main() {
     int n;
     std::cout << "Enter the number of processes: ";
     std::cin >> n;
-
+    
     std::vector<Process> processes(n);
     for (int i = 0; i < n; ++i) {
         processes[i].id = i + 1;
         std::cout << "Enter arrival time, burst time, and priority for process " << i + 1 << ": ";
         std::cin >> processes[i].arrival_time >> processes[i].burst_time >> processes[i].priority;
     }
-
+    
     std::sort(processes.begin(), processes.end(), compareArrivalTime);
     int current_time = processes[0].arrival_time;
-
+    
     while (!processes.empty()) {
         std::vector<Process> ready_queue;
         for (const auto &p : processes) {
@@ -64,30 +64,6 @@ int main() {
             current_time++;
         }
     }
-
-    // Calculate performance metrics
-    double avg_turnaround_time = 0;
-    double avg_waiting_time = 0;
-    double throughput = 0;
-    double cpu_utilization = 0;
-
-    for (const auto &p : processes)
-    {
-        avg_turnaround_time += p.turnaround_time;
-        avg_waiting_time += p.waiting_time;
-    }
-    avg_turnaround_time /= n;
-    avg_waiting_time /= n;
-
-    throughput = double(n) / current_time;
-
-    cpu_utilization = (current_time - processes.front().arrival_time) / double(current_time);
-
-    // Display performance metrics
-    std::cout << "Average turnaround time: " << avg_turnaround_time << std::endl;
-    std::cout << "Average waiting time: " << avg_waiting_time << std::endl;
-    std::cout << "Throughput: " << throughput << std::endl;
-    std::cout << "CPU utilization: " << cpu_utilization << std::endl;
 
     return 0;
 }
