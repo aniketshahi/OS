@@ -10,7 +10,7 @@ void sub(float a, float b)
 {
     float c;
     c = a - b;
-    cout << "Sum of a and b is:"<< c;
+    cout << "Sum of a and b is:" << c;
 }
 void mul(float a, float b)
 {
