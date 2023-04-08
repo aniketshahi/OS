@@ -3,7 +3,8 @@
 using namespace std;
 
 // Definition for a node in the linked list
-struct Node {
+struct Node
+{
     int data;
     Node *next;
 };
@@ -15,14 +16,16 @@ Node *front = NULL;
 Node *rear = NULL;
 
 // Function to insert an element into the queue
-void insert(int value) {
+void insert(int value)
+{
     // Create a new node
     Node *temp = new Node;
     temp->data = value;
     temp->next = NULL;
 
     // If the linked list is empty, set both front and rear pointers to the new node
-    if (front == NULL && rear == NULL) {
+    if (front == NULL && rear == NULL)
+    {
         front = rear = temp;
         return;
     }
@@ -35,9 +38,11 @@ void insert(int value) {
 }
 
 // Function to delete an element from the queue
-void deletion() {
+void deletion()
+{
     // If the linked list is empty, return
-    if (front == NULL) {
+    if (front == NULL)
+    {
         cout << "The queue is empty" << endl;
         return;
     }
@@ -53,9 +58,11 @@ void deletion() {
 }
 
 // Function to display the elements in the queue
-void display() {
+void display()
+{
     // If the linked list is empty, return
-    if (front == NULL) {
+    if (front == NULL)
+    {
         cout << "The queue is empty" << endl;
         return;
     }
@@ -64,7 +71,8 @@ void display() {
     Node *temp = front;
 
     // Traverse the linked list and print the data of each node
-    while (temp != NULL) {
+    while (temp != NULL)
+    {
         cout << temp->data << " ";
         temp = temp->next;
     }
@@ -72,12 +80,14 @@ void display() {
     cout << endl;
 }
 
-int main() {
+int main()
+{
     // Declare a variable to store the user's choice
     int choice;
 
     // Run an infinite loop until the user chooses to exit
-    while (true) {
+    while (true)
+    {
         // Print the menu options
         cout << "1. Insert an element into the queue" << endl;
         cout << "2. Delete an element from the queue" << endl;
@@ -89,28 +99,28 @@ int main() {
         cin >> choice;
 
         // Perform the corresponding operation based on the user's choice
-        switch (choice) {
-            case 1: // Insert an element into the queue
-                int value;
-                cout << "Enter the value to be inserted: ";
-                cin >> value;
-                insert(value);
-                break;
-            case 2: // Delete an element from the queue
-                deletion();
-                break;
-            case 3: // Display the elements in the queue
-                display();
-                break;
-            case 4: // Exit
-                exit(0);
-                        break;
-            default: // Invalid choice
-                cout << "Invalid choice, try again" << endl;
-                break;
+        switch (choice)
+        {
+        case 1: // Insert an element into the queue
+            int value;
+            cout << "Enter the value to be inserted: ";
+            cin >> value;
+            insert(value);
+            break;
+        case 2: // Delete an element from the queue
+            deletion();
+            break;
+        case 3: // Display the elements in the queue
+            display();
+            break;
+        case 4: // Exit
+            exit(0);
+            break;
+        default: // Invalid choice
+            cout << "Invalid choice, try again" << endl;
+            break;
         }
     }
 
     return 0;
 }
-
