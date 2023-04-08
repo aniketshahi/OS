@@ -6,12 +6,12 @@ using namespace std;
 class Process
 {
 public:
-    int pid; //process id
-    int at;  //arrival time
-    int bt;  //burst time
-    int wt;  //waiting time
-    int tat; //turn around time
-    int ct;  //completion time
+    int pid; // process id
+    int at;  // arrival time
+    int bt;  // burst time
+    int wt;  // waiting time
+    int tat; // turn around time
+    int ct;  // completion time
     Process()
     {
         pid = -1;
@@ -29,7 +29,7 @@ bool processCmpAT(Process p1, Process p2)
     if (p1.at < p2.at)
         return true;
     if (p1.at == p2.at)
-        return p1.pid < p2.pid; //if arrival times are equal compare pid
+        return p1.pid < p2.pid; // if arrival times are equal compare pid
     return false;
 }
 bool processCmpPid(Process p1, Process p2)
@@ -45,7 +45,7 @@ bool processCmpBT(Process p1, Process p2)
     if (p1.bt > p2.bt)
         return true;
     if (p1.bt == p2.bt)
-        return p1.pid < p2.pid; //if arrival times are equal compare pid
+        return p1.pid < p2.pid; // if arrival times are equal compare pid
     return false;
 }
 void display(vector<Process> &, int);
@@ -99,7 +99,7 @@ int main()
             // process ready and calculate ct
             sort(ready.begin(), ready.end(), processCmpBT);
             clock += ready[0].bt;
-            //instead of following complicated if else I could do ct = clock ;
+            // instead of following complicated if else I could do ct = clock ;
             ready[0].ct = clock;
             // if (completed.empty()) //first case
             // {

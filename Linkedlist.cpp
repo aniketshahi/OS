@@ -2,7 +2,8 @@
 using namespace std;
 
 // Structure to define a node in the linked list
-struct Node {
+struct Node
+{
     int data;
     Node *next;
 };
@@ -14,7 +15,8 @@ Node *front = NULL;
 Node *rear = NULL;
 
 // Function to insert an element into the linked list (queue)
-void insert(int value) {
+void insert(int value)
+{
     // Allocate a new node in the memory
     Node *newNode = new Node;
 
@@ -25,7 +27,8 @@ void insert(int value) {
     newNode->next = NULL;
 
     // If the linked list is empty, set the front and rear pointers to the new node
-    if (front == NULL && rear == NULL) {
+    if (front == NULL && rear == NULL)
+    {
         front = rear = newNode;
         return;
     }
@@ -36,9 +39,11 @@ void insert(int value) {
 }
 
 // Function to delete an element from the linked list (queue)
-void deletion(int position) {
+void deletion(int position)
+{
     // If the linked list is empty, return
-    if (front == NULL) {
+    if (front == NULL)
+    {
         cout << "The linked list is empty" << endl;
         return;
     }
@@ -47,19 +52,22 @@ void deletion(int position) {
     Node *temp = front;
 
     // If the user wants to delete the first node, set the front pointer to the next node
-    if (position == 1) {
+    if (position == 1)
+    {
         front = temp->next;
         delete temp;
         return;
     }
 
     // Traverse the linked list to find the node at the specified position
-    for (int i = 0; temp != NULL && i < position - 2; i++) {
+    for (int i = 0; temp != NULL && i < position - 2; i++)
+    {
         temp = temp->next;
     }
 
     // If the specified position is greater than the number of nodes in the linked list, return
-    if (temp == NULL || temp->next == NULL) {
+    if (temp == NULL || temp->next == NULL)
+    {
         cout << "The specified position is not available in the linked list" << endl;
         return;
     }
@@ -74,11 +82,12 @@ void deletion(int position) {
     temp->next = next;
 }
 
-
 // Function to display the elements in the linked list (queue)
-void display() {
+void display()
+{
     // If the linked list is empty, return
-    if (front == NULL) {
+    if (front == NULL)
+    {
         cout << "The queue is empty" << endl;
         return;
     }
@@ -87,19 +96,22 @@ void display() {
     Node *ptr = front;
 
     // Traverse the linked list and print the elements
-    while (ptr != NULL) {
+    while (ptr != NULL)
+    {
         cout << ptr->data << " ";
         ptr = ptr->next;
     }
     cout << endl;
 }
 
-int main() {
+int main()
+{
     // Declare a variable to store the user's choice
     int choice;
 
     // Run an infinite loop until the user chooses to exit
-    while (true) {
+    while (true)
+    {
         // Print the menu options
         cout << "1. Insert an element into the queue" << endl;
         cout << "2. Delete an element from the queue" << endl;
@@ -111,28 +123,29 @@ int main() {
         cin >> choice;
 
         // Perform the corresponding operation based on the user's choice
-        switch (choice) {
-            case 1: // Insert an element into the queue
-                int value;
-                cout << "Enter the value to be inserted: ";
-                cin >> value;
-                insert(value);
-                break;
-            case 2: // Delete an element from the queue
-                int position;
-                cout << "Enter the position of the element to be deleted: ";
-                cin >> position;
-                deletion(position);
-                break;
-            case 3: // Display the elements in the queue
-                display();
-                break;
-            case 4: // Exit
-                exit(0);
-                break;
-            default: // Invalid choice
-                cout << "Invalid choice, try again" << endl;
-                break;
+        switch (choice)
+        {
+        case 1: // Insert an element into the queue
+            int value;
+            cout << "Enter the value to be inserted: ";
+            cin >> value;
+            insert(value);
+            break;
+        case 2: // Delete an element from the queue
+            int position;
+            cout << "Enter the position of the element to be deleted: ";
+            cin >> position;
+            deletion(position);
+            break;
+        case 3: // Display the elements in the queue
+            display();
+            break;
+        case 4: // Exit
+            exit(0);
+            break;
+        default: // Invalid choice
+            cout << "Invalid choice, try again" << endl;
+            break;
         }
     }
 
