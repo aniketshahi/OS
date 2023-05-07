@@ -1,65 +1,94 @@
 #include <iostream>
-#include <climits>
+#include <vector>
+#include <queue>
+#include <algorithm>
 
 using namespace std;
 
-struct Process
-{
-    int pid;           // process ID
-    int arrivalTime;   // arrival time
-    int burstTime;     // burst time
-    int remainingTime; // remaining time
+struct Process {
+    int pid;       // process id
+    int arrival;   // arrival time
+    int burst;     // burst time
+    int remaining; // remaining time
+    int waiting;   // waiting time
+    int turnaround;// turnaround time
 };
 
-int main()
-{
-    const int n = 5; // number of processes
-    Process processes[n];
+bool operator<(const Process& p1, const Process& p2) {
+    return p1.remaining > p2.remaining; // sort by remaining time
+}
 
-    // Initialize the processes
-    for (int i = 0; i < n; i++)
-    {
-        processes[i].pid = i + 1;
-        cout << "Enter the arrival time and burst time for process " << i + 1 << ": ";
-        cin >> processes[i].arrivalTime >> processes[i].burstTime;
-        processes[i].remainingTime = processes[i].burstTime;
-    }
+void SRTF(vector<Process>& processes) {
+    int n = processes.size();
+    int current_time = 0;
+    int total_waiting = 0;
+    int total_turnaround = 0;
+    priority_queue<Process> ready_queue;
 
-    int currentTime = 0;
-    int completedProcesses = 0;
+    // sort processes by arrival time
+    sort(processes.begin(), processes.end(),
+         [](const Process& p1, const Process& p2) {
+             return p1.arrival < p2.arrival;
+         });
 
-    while (completedProcesses < n)
-    {
-        int shortestTime = INT_MAX;
-        int shortestIndex = -1;
+    // process the processes
+    while (!ready_queue.empty() || !processes.empty()) {
+        // add arriving processes to the ready queue
+        while (!processes.empty() && processes.back().arrival <= current_time) {
+            ready_queue.push(processes.back());
+            processes.pop_back();
+        }
 
-        // Find the process with the shortest remaining time
-        for (int i = 0; i < n; i++)
-        {
-            if (processes[i].arrivalTime <= currentTime && processes[i].remainingTime < shortestTime && processes[i].remainingTime > 0)
-            {
-                shortestTime = processes[i].remainingTime;
-                shortestIndex = i;
+        // pick the shortest remaining time process from the ready queue
+        if (!ready_queue.empty()) {
+            Process p = ready_queue.top();
+            ready_queue.pop();
+
+            // update waiting and turnaround times
+            p.waiting = current_time - p.arrival;
+            p.turnaround = p.waiting + p.burst;
+            total_waiting += p.waiting;
+            total_turnaround += p.turnaround;
+
+            // execute the process for one unit of time
+            p.remaining--;
+            current_time++;
+
+            // add the process back to the ready queue if it's not finished
+            if (p.remaining > 0) {
+                ready_queue.push(p);
             }
         }
-
-        if (shortestIndex == -1)
-        {
-            currentTime++;
-            continue;
-        }
-
-        // Execute the process for 1 unit of time
-        processes[shortestIndex].remainingTime--;
-        currentTime++;
-
-        // Check if the process has completed
-        if (processes[shortestIndex].remainingTime == 0)
-        {
-            cout << "Process " << processes[shortestIndex].pid << " completed at time " << currentTime << endl;
-            completedProcesses++;
+        else {
+            // no processes are ready, wait for the next one to arrive
+            current_time = processes.back().arrival;
         }
     }
 
+    // print the results
+    double cpu_utilization = (double)(current_time - processes.front().arrival) / current_time * 100;
+    double avg_waiting = (double)total_waiting / n;
+    double avg_turnaround = (double)total_turnaround / n;
+    cout << "CPU utilization: " << cpu_utilization << "%" << endl;
+    cout << "Average waiting time: " << avg_waiting << endl;
+    cout << "Average turnaround time: " << avg_turnaround << endl;
+}
+
+int main() {
+    int n;
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    vector<Process> processes;
+    for (int i = 0; i < n; i++) {
+        Process p;
+        cout << "Enter arrival time and burst time for process " << i+1 << ": ";
+        cin >> p.arrival >> p.burst;
+        p.pid = i+1;
+        p.remaining = p.burst;
+        processes.push_back(p);
+    }
+
+    SRTF(processes);
     return 0;
 }
