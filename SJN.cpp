@@ -1,105 +1,107 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
-RR #include<climits>
+#include <vector>
 
-    using namespace std;
+using namespace std;
 
-bool compareByArrivalTime(const vector<int> &a, const vector<int> &b)
-{
-    return a[1] < b[1];
+struct Process {
+    int pid;
+    int arrival_time;
+    int burst_time;
+    int completion_time;
+    int turn_around_time;
+    int waiting_time;
+};
+
+bool compareArrivalTime(const Process& a, const Process& b) {
+    return a.arrival_time < b.arrival_time;
 }
 
-bool compareByBurstTime(const vector<int> &a, const vector<int> &b)
-{
-    return a[2] < b[2];
+bool compareBurstTime(const Process& a, const Process& b) {
+    return a.burst_time < b.burst_time;
 }
 
-void sjn(vector<vector<int>> &processes)
-{
+void calculateCompletionTime(vector<Process>& processes) {
     int n = processes.size();
     int current_time = 0;
-    int waiting_time = 0;
-    int turnaround_time = 0;
-    vector<vector<int>> completed_processes;
+    for (int i = 0; i < n; i++) {
+        if (current_time < processes[i].arrival_time) {
+            current_time = processes[i].arrival_time;
+        }
+        processes[i].completion_time = current_time + processes[i].burst_time;
+        current_time = processes[i].completion_time;
+    }
+}
 
-    sort(processes.begin(), processes.end(), compareByArrivalTime);
+void calculateTurnAroundTime(vector<Process>& processes) {
+    int n = processes.size();
+    for (int i = 0; i < n; i++) {
+        processes[i].turn_around_time = processes[i].completion_time - processes[i].arrival_time;
+    }
+}
 
-    while (completed_processes.size() < n)
-    {
-        int smallest_burst_time = INT_MAX;
-        int smallest_process_index = -1;
+void calculateWaitingTime(vector<Process>& processes) {
+    int n = processes.size();
+    for (int i = 0; i < n; i++) {
+        processes[i].waiting_time = processes[i].turn_around_time - processes[i].burst_time;
+    }
+}
 
-        for (int i = 0; i < n; i++)
-        {
-            if (processes[i][2] < smallest_burst_time && find(completed_processes.begin(), completed_processes.end(), processes[i]) == completed_processes.end() && processes[i][1] <= current_time)
-            {
-                smallest_burst_time = processes[i][2];
-                smallest_process_index = i;
+void printTable(const vector<Process>& processes) {
+    int n = processes.size();
+    cout << "PID\tArrival Time\tBurst Time\tCompletion Time\tTurn Around Time\tWaiting Time\n";
+    for (int i = 0; i < n; i++) {
+        cout << processes[i].pid << "\t" << processes[i].arrival_time << "\t\t" << processes[i].burst_time << "\t\t"
+            << processes[i].completion_time << "\t\t" << processes[i].turn_around_time << "\t\t\t"
+            << processes[i].waiting_time << endl;
+    }
+}
+
+int main() {
+    int n;
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    vector<Process> processes(n);
+
+    for (int i = 0; i < n; i++) {
+        cout << "Enter arrival time and burst time for process " << i + 1 << ": ";
+        cin >> processes[i].arrival_time >> processes[i].burst_time;
+        processes[i].pid = i + 1;
+    }
+
+    sort(processes.begin(), processes.end(), compareArrivalTime);
+
+    vector<Process> ready_queue;
+    int current_time = 0;
+    int completed_processes = 0;
+
+    while (completed_processes < n) {
+        for (int i = 0; i < n; i++) {
+            if (processes[i].arrival_time <= current_time && processes[i].completion_time == 0) {
+                ready_queue.push_back(processes[i]);
             }
         }
 
-        if (smallest_process_index == -1)
-        {
+        if (!ready_queue.empty()) {
+            sort(ready_queue.begin(), ready_queue.end(), compareBurstTime);
+            Process next_process = ready_queue.front();
+            ready_queue.erase(ready_queue.begin());
+
+            next_process.completion_time = current_time + next_process.burst_time;
+            current_time = next_process.completion_time;
+
+            completed_processes++;
+            processes[next_process.pid - 1] = next_process;
+        } else {
             current_time++;
-        }
-        else
-        {
-            vector<int> current_process = processes[smallest_process_index];
-            int current_process_start_time = current_time;
-            current_time += current_process[2];
-
-            waiting_time += current_process_start_time - current_process[1];
-            turnaround_time += current_time - current_process[1];
-
-            completed_processes.push_back(current_process);
         }
     }
 
-    double avg_waiting_time = static_cast<double>(waiting_time) / n;
-    double avg_turnaround_time = static_cast<double>(turnaround_time) / n;
-
-    cout << "Average waiting time: " << avg_waiting_time << endl;
-    cout << "Average turnaround time: " << avg_turnaround_time << endl;
-}
-
-int main()
-{
-    int choice, n, id, arrival_time, burst_time;
-    vector<vector<int>> processes;
-
-    do
-    {
-        cout << "Enter your choice:" << endl;
-        cout << "1. Add a process" << endl;
-        cout << "2. Run SJN algorithm" << endl;
-        cout << "3. Exit" << endl;
-        cin >> choice;
-
-        switch (choice)
-        {
-        case 1:
-            cout << "Enter process ID: ";
-            cin >> id;
-            cout << "Enter arrival time: ";
-            cin >> arrival_time;
-            cout << "Enter burst time: ";
-            cin >> burst_time;
-            processes.push_back({id, arrival_time, burst_time});
-            break;
-        case 2:
-            sjn(processes);
-            break;
-        case 3:
-            cout << "Exiting..." << endl;
-            break;
-        default:
-            cout << "Invalid choice. Please try again." << endl;
-            break;
-        }
-
-        cout << endl;
-    } while (choice != 3);
+    calculateCompletionTime(processes);
+    calculateTurnAroundTime(processes);
+    calculateWaitingTime(processes);
+    printTable(processes);
 
     return 0;
 }
