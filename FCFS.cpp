@@ -22,9 +22,9 @@ bool compare_AT(Process p1, Process p2)
 
 void print_table(Process processes[], int n, float avg_WT, float avg_TAT,float THPT) 
 {
-    cout << "Pid\tAT\tBT\tCT\tWT\tTAT" << endl;
+    cout << "Pid\tAT\tBT\tCT\tTAT\tWT "<< endl;
     for (int i = 0; i < n; i++) {
-        cout << processes[i].Pid << "\t" << processes[i].AT << "\t" << processes[i].BT << "\t" << processes[i].CT << "\t" << processes[i].WT << "\t" << processes[i].TAT << endl;
+        cout << processes[i].Pid << "\t" << processes[i].AT << "\t" << processes[i].BT << "\t" << processes[i].CT << "\t" << processes[i].TAT<<"\t"<< processes[i].WT << endl;
     }
     cout << "Average WT is : " << avg_WT << endl;
     cout << "Average TAT is : " << avg_TAT << endl;
@@ -65,9 +65,9 @@ int main()
     Process processes[n];
     for (int i = 0; i < n; i++) {
         processes[i].Pid = i + 1;
-        cout << "Enter the at of process " << i + 1 << ": ";
+        cout << "Enter the AT of process " << i + 1 << ": ";
         cin >> processes[i].AT;
-        cout << "Enter the bt of process " << i + 1 << ": ";
+        cout << "Enter the BT of process " << i + 1 << ": ";
         cin >> processes[i].BT;
     }
 
