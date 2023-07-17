@@ -3,7 +3,7 @@
 
 using namespace std;
 
-class Process 
+class Process
 {
 public:
     int Pid;
@@ -25,15 +25,16 @@ public:
     }
 };
 
-bool compare_AT(const Process& p1, const Process& p2) 
+bool compare_AT(const Process &p1, const Process &p2)
 {
     return p1.AT < p2.AT;
 }
 
-void print_table(Process* processes, int n, float avg_WT, float avg_TAT, float THPT) 
+void print_table(Process *processes, int n, float avg_WT, float avg_TAT, float THPT)
 {
     cout << "Pid\tAT\tBT\tCT\tTAT\tWT " << endl;
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         cout << processes[i].Pid << "\t" << processes[i].AT << "\t" << processes[i].BT << "\t" << processes[i].CT << "\t" << processes[i].TAT << "\t" << processes[i].WT << endl;
     }
     cout << "Average WT is: " << avg_WT << endl;
@@ -41,12 +42,14 @@ void print_table(Process* processes, int n, float avg_WT, float avg_TAT, float T
     cout << "Throughput is: " << THPT << endl;
 }
 
-void fcfs_scheduling(Process* processes, int n) 
+void fcfs_scheduling(Process *processes, int n)
 {
     int current_time = 0;
     float total_WT = 0, total_TAT = 0;
-    for (int i = 0; i < n; i++) {
-        if (current_time < processes[i].AT) {
+    for (int i = 0; i < n; i++)
+    {
+        if (current_time < processes[i].AT)
+        {
             current_time = processes[i].AT;
         }
         current_time += processes[i].BT;
@@ -63,14 +66,15 @@ void fcfs_scheduling(Process* processes, int n)
     print_table(processes, n, avg_WT, avg_TAT, THPT);
 }
 
-int main() 
+int main()
 {
     int n;
     cout << "Enter the number of processes: ";
     cin >> n;
 
-    Process* processes = new Process[n];
-    for (int i = 0; i < n; i++) {
+    Process *processes = new Process[n];
+    for (int i = 0; i < n; i++)
+    {
         int pid, at, bt;
         pid = i + 1;
         cout << "Enter the AT of process " << pid << ": ";
